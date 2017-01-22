@@ -12,19 +12,22 @@ class Application(tk.Frame):
         self.create_widgets()
 
     def create_widgets(self):
-        self.next = tk.Button(self)
-        self.next["text"] = "Next"
-        self.next["command"] = self.update_text
-        self.next.pack(side="top")
-
         self.label = tk.Label(self)
         self.label["text"] = ""
         self.label["font"] = "{courier 10 bold}"
         self.label.pack(side="top")
 
+        self.next = tk.Button(self)
+        self.next["text"] = "Next"
+        self.next["command"] = self.update_text
+        self.next["font"] = "{courier 10 bold}"
+        self.next.pack(side="top", fill="both")
+
+
         self.quit = tk.Button(self, text="QUIT", fg="red",
                               command=root.destroy)
-        self.quit.pack(side="bottom")
+        self.quit["font"] = "{courier 10 bold}"
+        self.quit.pack(side="bottom", fill="x")
 
     def update_text(self):
         text = '  '.join([choice(adjatives),
@@ -37,5 +40,4 @@ if __name__ == "__main__":
     root = tk.Tk()
     app = Application(master=root)
     app.master.title("Second Impressions")
-    app.master.minsize(800, 300)
     app.mainloop()
