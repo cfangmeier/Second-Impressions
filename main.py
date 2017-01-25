@@ -10,6 +10,7 @@ class Application(tk.Frame):
         tk.Frame.__init__(self, master)
         self.pack()
         self.create_widgets()
+        self.update_text()
 
     def create_widgets(self):
         self.label = tk.Label(self)
