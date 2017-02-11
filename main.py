@@ -1,8 +1,31 @@
-#!/usr/bin/python
+#!/usr/bin/env python
 import tkinter as tk
 from random import choice
+import argparse
+import sys
+import flask
 
 from game_data import adjatives, people, situations
+
+subs = {"M": {
+        "{his}": "his",
+        "{he's}": "he's",
+        },
+        "F": {
+        "{his}": "her",
+        "{he's}": "she's",
+        }}
+
+def engender(situation, gender):
+    for from_, to in subs[gender].items():
+        situation = situation.replace(from_, to)
+    return situation
+
+def new_text():
+    adj = choice(adjatives)
+    person, gender = choice(people)
+    situation = engender(choice(situations), gender)
+    return '  '.join([adj, person, situation])
 
 
 class Application(tk.Frame):
@@ -24,21 +47,33 @@ class Application(tk.Frame):
         self.next["font"] = "{courier 10 bold}"
         self.next.pack(side="top", fill="both")
 
-
         self.quit = tk.Button(self, text="QUIT", fg="red",
                               command=root.destroy)
         self.quit["font"] = "{courier 10 bold}"
         self.quit.pack(side="bottom", fill="x")
 
     def update_text(self):
-        text = '  '.join([choice(adjatives),
-                         choice(people),
-                         choice(situations)])
-        self.label["text"] = text
+        self.label["text"] = new_text()
+
+
+def start_webapp():
+    app = flask.Flask(__name__)
+
+    @app.route("/")
+    def hello():
+        template = open("index.html", "r").read()
+        return flask.render_template_string(template, content=new_text())
+    app.run()
 
 
 if __name__ == "__main__":
-    root = tk.Tk()
-    app = Application(master=root)
-    app.master.title("Second Impressions")
-    app.mainloop()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('-w', action="store_true", help="start in browser")
+    args = parser.parse_args(sys.argv[1:])
+    if args.w:
+        start_webapp()
+    else:
+        root = tk.Tk()
+        app = Application(master=root)
+        app.master.title("Second Impressions")
+        app.mainloop()
