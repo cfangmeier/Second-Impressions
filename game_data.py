@@ -377,7 +377,7 @@ situations = [
     "shitting out a pine-cone",
     "shoveling kittens into a wood-chipper",
     "singing \"My Heart Will go On\"",
-    "singing an musical",
+    "singing a musical",
     "singing an opera",
     "slowly becoming a duck",
     "slowly being pulled toward a large fan",

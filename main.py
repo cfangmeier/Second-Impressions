@@ -7,6 +7,8 @@ import flask
 
 from game_data import adjatives, people, situations
 
+app = flask.Flask(__name__)
+
 subs = {"M": {
         "{his}": "his",
         "{he's}": "he's",
@@ -56,24 +58,24 @@ class Application(tk.Frame):
         self.label["text"] = new_text()
 
 
-def start_webapp():
-    app = flask.Flask(__name__)
 
-    @app.route("/")
-    def hello():
-        template = open("index.html", "r").read()
-        return flask.render_template_string(template, content=new_text())
-    app.run()
-
+@app.route("/")
+def hello():
+    template = open("index.html", "r").read()
+    return flask.render_template_string(template, content=new_text())
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
-    parser.add_argument('-w', action="store_true", help="start in browser")
-    args = parser.parse_args(sys.argv[1:])
-    if args.w:
-        start_webapp()
-    else:
-        root = tk.Tk()
-        app = Application(master=root)
-        app.master.title("Second Impressions")
-        app.mainloop()
+    app.run(host="0.0.0.0", port=8080)
+
+
+# if __name__ == "__main__":
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('-w', action="store_true", help="start in browser")
+#     args = parser.parse_args(sys.argv[1:])
+#     if args.w:
+#         start_webapp()
+#     else:
+#         root = tk.Tk()
+#         app = Application(master=root)
+#         app.master.title("Second Impressions")
+#         app.mainloop()
