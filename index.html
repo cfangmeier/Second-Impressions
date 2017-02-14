@@ -45,12 +45,22 @@
             <div class="container">
               <div class="jumbotron">
                 <h1>Second Impressions</h1>
-                <p>A character impersonation game</p>
+                <p><b>A character impersonation game</b></p>
               </div>
             </div>
           <h1 class="text-center">
-          {{ content }}
+            {{ content|safe }}
           <h1>
+        </div>
+      </div>
+      <hr/>
+      <div class="row">
+        <div class="col-md-4">
+        </div>
+        <div class="col-md-4">
+          <p class="bg-info text-center">Refresh to get a new impersonation</p>
+        </div>
+        <div class="col-md-4">
         </div>
       </div>
     </div>
