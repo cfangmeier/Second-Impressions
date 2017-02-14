@@ -1,9 +1,9 @@
 #!/usr/bin/env python
-import tkinter as tk
 from random import choice
 import argparse
 import sys
 import flask
+import markdown
 
 from game_data import adjatives, people, situations
 
@@ -11,12 +11,20 @@ app = flask.Flask(__name__)
 
 subs = {"M": {
         "{his}": "his",
+        "{he}": "he",
         "{he's}": "he's",
         },
         "F": {
         "{his}": "her",
+        "{he}": "she",
         "{he's}": "she's",
-        }}
+        },
+        "N": {
+        "{his}": "its",
+        "{he}": "it",
+        "{he's}": "it's",
+        },
+        }
 
 def engender(situation, gender):
     for from_, to in subs[gender].items():
@@ -27,35 +35,7 @@ def new_text():
     adj = choice(adjatives)
     person, gender = choice(people)
     situation = engender(choice(situations), gender)
-    return '  '.join([adj, person, situation])
-
-
-class Application(tk.Frame):
-    def __init__(self, master=None):
-        tk.Frame.__init__(self, master)
-        self.pack()
-        self.create_widgets()
-        self.update_text()
-
-    def create_widgets(self):
-        self.label = tk.Label(self)
-        self.label["text"] = ""
-        self.label["font"] = "{courier 10 bold}"
-        self.label.pack(side="top")
-
-        self.next = tk.Button(self)
-        self.next["text"] = "Next"
-        self.next["command"] = self.update_text
-        self.next["font"] = "{courier 10 bold}"
-        self.next.pack(side="top", fill="both")
-
-        self.quit = tk.Button(self, text="QUIT", fg="red",
-                              command=root.destroy)
-        self.quit["font"] = "{courier 10 bold}"
-        self.quit.pack(side="bottom", fill="x")
-
-    def update_text(self):
-        self.label["text"] = new_text()
+    return markdown.markdown('  '.join([adj, person, situation]))
 
 
 
@@ -66,16 +46,3 @@ def hello():
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
-
-
-# if __name__ == "__main__":
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('-w', action="store_true", help="start in browser")
-#     args = parser.parse_args(sys.argv[1:])
-#     if args.w:
-#         start_webapp()
-#     else:
-#         root = tk.Tk()
-#         app = Application(master=root)
-#         app.master.title("Second Impressions")
-#         app.mainloop()
