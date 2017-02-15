@@ -413,7 +413,7 @@ situations = [
     "weighing the pros and cons of blitzing a weak-side corner on third and long",
     "who is a high-school gym teacher who picks on the fat kids",
     "with a mouthfull of marshmallows",
-    "rallying the spartans at the battle of Thermopaly",
+    "rallying the Spartans at the battle of Thermopylae",
     "evolving into a being of pure conciousness",
     "trying to discreetly eat a particuarly crunchy taco at a funeral",
     "performing CPR",
@@ -428,6 +428,6 @@ situations = [
     "politely declining gay sex",
     "knawing off {his} own leg to escape a bear trap",
     "posing as a high school kid as part of an elaborate plan to bring down a drug dealer",
-    "trying to explain to Captain Planet why they deserve to be a Planeteer",
+    "trying to explain to Captain Planet why {he} deserves to be a Planeteer",
     "storming the beaches on D-Day, but is having second thoughts",
     ]
