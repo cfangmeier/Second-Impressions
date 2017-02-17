@@ -11,16 +11,19 @@ app = flask.Flask(__name__)
 
 subs = {"M": {
         "{his}": "his",
+        "{him}": "him",
         "{he}": "he",
         "{he's}": "he's",
         },
         "F": {
         "{his}": "her",
+        "{him}": "her",
         "{he}": "she",
         "{he's}": "she's",
         },
         "N": {
         "{his}": "its",
+        "{him}": "it",
         "{he}": "it",
         "{he's}": "it's",
         },
