@@ -3,11 +3,13 @@ from random import choice
 import argparse
 import sys
 import flask
-import markdown
+from flaskext.markdown import Markdown
+# import markdown
 
 from game_data import adjatives, people, situations
 
 app = flask.Flask(__name__)
+Markdown(app)
 
 subs = {"M": {
         "{his}": "his",
@@ -38,7 +40,7 @@ def new_text():
     adj = choice(adjatives)
     person, gender = choice(people)
     situation = engender(choice(situations), gender)
-    return markdown.markdown('  '.join([adj, person, situation]))
+    return '  '.join([adj, person, situation])
 
 
 
