@@ -66,7 +66,7 @@ def submit_situation():
     if form.validate_on_submit():
         with open(SUBMITTED_SITUATIONS_FILE, "a") as f:
             f.write(fmt_submission(form.submission.data))
-            flash("Situtation sucessfully submitted")
+            flash("Situation sucessfully submitted")
         return redirect(url_for("index"));
     else:
         template = open("submit.html", "r").read()
@@ -85,7 +85,6 @@ def submit_person():
         return render_template_string(template, form=form)
 
 @app.route("/")
-@app.route("/index.html")
 def index():
     template = open("index.html", "r").read()
     return render_template_string(template, content=new_text())
