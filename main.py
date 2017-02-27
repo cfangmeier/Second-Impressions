@@ -6,7 +6,7 @@ from datetime import datetime
 from flask import Flask, url_for, render_template_string, redirect, flash, request
 from flaskext.markdown import Markdown
 from flask_wtf import FlaskForm
-from wtforms import StringField
+from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from game_data import adjatives, people, situations
@@ -50,7 +50,7 @@ def new_text():
     return '  '.join([adj, person, situation])
 
 class SituationForm(FlaskForm):
-    submission = StringField('Situation', validators=[DataRequired()])
+    submission = TextAreaField('Situation', validators=[DataRequired()])
 
 class PersonForm(FlaskForm):
     submission = StringField('Person', validators=[DataRequired()])

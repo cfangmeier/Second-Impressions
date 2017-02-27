@@ -1,7 +1,0 @@
-a hilarious situation
-Person's Name
-2017-02-27 12:17:21.996335 FROM 129.93.32.58: 
-Person's Name=====
-2017-02-27 12:44:47.863882 FROM 129.93.4.34: 
-The situation
-=======================

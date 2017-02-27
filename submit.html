@@ -48,18 +48,22 @@
                 <p><b>A character impersonation game</b></p>
               </div>
             </div>
-          <h1 class="text-center">
-          <form method="POST">
-            {{ form.csrf_token }}
-	    <div class="form-group center-block">
-              {{ form.submission.label }}
-              {{ form.submission(size=20, class="form-control", id="submission") }}
-	    </div>
-	    <input type="submit" class="btn btn-default" value="Submit">
-          </form>
-          <h1>
         </div>
       </div>
+        <div class="row">
+          <div class="col-sm-3"> </div>
+          <div class="col-sm-6 text-center">
+            <form method="POST">
+              {{ form.csrf_token }}
+	      <div class="form-group center-block">
+                {{ form.submission.label(class="h1") }}
+                {{ form.submission(size=20, class="form-control", rows=2, id="submission") }}
+	      </div>
+	      <input type="submit" class="btn btn-default" value="Submit">
+            </form>
+          </div>
+          <div class="col-sm-3"> </div>
+        </div>
     </div>
   </body>
 </html>
