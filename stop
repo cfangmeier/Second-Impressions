@@ -1,0 +1,3 @@
+#!/usr/bin/bash
+sudo systemctl stop uwsgi@si.service
+rm -f si.sock
