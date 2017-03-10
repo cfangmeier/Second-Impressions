@@ -297,7 +297,7 @@ situations = [
     "being constantly shit on by a flock of seagulls",
     "being electrocuted",
     "being very slowly flattened by a steam roller",
-    "believes the government is after them",
+    "believes the government is after {him}",
     "breaking the news to someone that they have a terminal disease",
     "can't control the volume of {his} own voice",
     "can't find the remote-control",
