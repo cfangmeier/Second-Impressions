@@ -236,33 +236,51 @@ def engender(situation, gender):
             "{him}": "him",
             "{he}": "he",
             "{he's}": "he's",
+            "{himself}": "himself",
             },
             Gender.female: {
             "{his}": "her",
             "{him}": "her",
             "{he}": "she",
             "{he's}": "she's",
+            "{himself}": "herself",
             },
             Gender.neutral: {
             "{his}": "its",
             "{him}": "it",
             "{he}": "it",
             "{he's}": "it's",
+            "{himself}": "itself",
             },
             }
     for from_, to in subs[gender].items():
         situation = situation.replace(from_, to)
     return situation
 
+def pick(l, prev20):
+    if len(l) <=20:
+        return choice(l)
+    while True:
+        pick = choice(l)
+        if l in prev20:
+            continue
+        if len(prev20)>=20:
+            prev20.pop()
+        prev20.insert(0, pick)
+        return pick
+
+prev20_adj = []
+prev20_sit = []
+prev20_per = []
 
 def new_text():
     adjatives = Adjative.query.filter(Adjative.approved).all()
     people = Person.query.filter(Person.approved).all()
     situations = Situation.query.filter(Situation.approved).all()
-    adj = choice(adjatives).adjative
-    person = choice(people)
+    adj = pick(adjatives, prev20_adj).adjative
+    person = pick(people, prev20_per)
     name, gender = person.name, person.gender
-    situation = engender(choice(situations).situation, gender)
+    situation = engender(pick(situations, prev20_sit).situation, gender)
     return '  '.join([adj, name, situation])
 
 
@@ -308,7 +326,6 @@ def submit_person():
 
 @app.route("/")
 def index():
-    print(current_user)
     template = open("index.html", "r").read()
     return render_template_string(template, content=new_text())
 
