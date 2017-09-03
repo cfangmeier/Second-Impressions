@@ -12,6 +12,7 @@
       href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap-theme.min.css"
       integrity="sha384-fLW2N01lMqjakBkx3l/M9EahuwpSfeNvV63J5ezn3uZzapT0u7EYsXMjQV+0En5r"
       crossorigin="anonymous">
+    <link rel="stylesheet" href={{ url_for('static', filename='css/custom.css') }} >
     <script src="https://code.jquery.com/jquery-2.2.4.min.js"
       integrity="sha256-BbhdlvQf/xTY9gja0Dq3HiwQF8LaCRTXxZKRutelT44="
       crossorigin="anonymous"></script>
@@ -43,7 +44,7 @@
             {% endif %}
           {% endwith %}
             <div class="container">
-              <div class="jumbotron">
+              <div class="jumbotron jumbo">
                 <h1><a href="{{url_for("index")}}">Second Impressions</a></h1>
                 <p><b>A character impersonation game</b></p>
                 {% block title %}
