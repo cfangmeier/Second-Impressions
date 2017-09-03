@@ -44,14 +44,15 @@
           {% endwith %}
             <div class="container">
               <div class="jumbotron">
-                <h1>Second Impressions</h1>
+                <h1><a href="{{url_for("index")}}">Second Impressions</a></h1>
                 <p><b>A character impersonation game</b></p>
+                {% block title %}
+                <hr>
+                <h3 class="text-right text-{{gamemode[1]}}"><b>{{gamemode[0]}}</b></p>
+                {% endblock %}
               </div>
             </div>
-          <h1 class="text-center">
-            {{ content|markdown }}
-            <button class="btn btn-primary" onclick="location.reload()"><span class="glyphicon glyphicon-refresh"></span> Hit Me!</button>
-          <h1>
+            {% block content %} {% endblock %}
         </div>
       </div>
       <div class="navbar navbar-fixed-bottom">

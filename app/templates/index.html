@@ -1,0 +1,10 @@
+{% extends "base.html" %}
+{% block title %}
+{% endblock %}
+{% block content %}
+<h2 class="text-center"><b>Select a GameMode!</b></h2>
+{% for gamemode, (mode_title, mode_type) in gamemodes.items() %}
+<a href="{{url_for(gamemode)}}" class="btn btn-{{mode_type}} btn-lg btn-block" role="button">{{mode_title}}</a>
+{% endfor %}
+</ul>
+{% endblock %}

@@ -1,3 +1,5 @@
+import os
+basedir = os.path.abspath(os.path.dirname(__file__))
 ###############################################################################
 # WTF CONFIGURATION
 ###############################################################################
@@ -5,7 +7,7 @@ WTF_CSRF_ENABLED = True
 SECRET_KEY = 'hJeqWmafXUxEQ3RRSFMkMDyg7'
 
 DATABASE_FILE = 'appdata.sqlite3'
-SQLALCHEMY_DATABASE_URI = 'sqlite:///'+DATABASE_FILE
+SQLALCHEMY_DATABASE_URI = 'sqlite:///'+os.path.join(basedir, DATABASE_FILE)
 
 # Flask-Security config
 SECURITY_URL_PREFIX = "/admin"
