@@ -21,7 +21,6 @@ class RestrictedView(ModelView):
         Override builtin _handle_view in order to redirect users when a view is
         not accessible.
         """
-        print(current_user)
         if not self.is_accessible():
             if current_user.is_authenticated:
                 # permission denied
@@ -97,6 +96,35 @@ class Situation(db.Model):
         self.approved = False
         self.timestamp = datetime.now()
 
+    def engender(self, gender):
+        situation = self.situation
+        if gender == Gender.unknown:
+            gender = Gender.male
+        subs = {Gender.male: {
+                "{his}": "his",
+                "{him}": "him",
+                "{he}": "he",
+                "{he's}": "he's",
+                "{himself}": "himself",
+                },
+                Gender.female: {
+                "{his}": "her",
+                "{him}": "her",
+                "{he}": "she",
+                "{he's}": "she's",
+                "{himself}": "herself",
+                },
+                Gender.neutral: {
+                "{his}": "its",
+                "{him}": "it",
+                "{he}": "it",
+                "{he's}": "it's",
+                "{himself}": "itself",
+                }}
+        for from_, to in subs[gender].items():
+            situation = situation.replace(from_, to)
+        return situation
+
     def __repr__(self):
         sit = self.situation
         if len(self.situation) > 20:
@@ -112,3 +140,54 @@ class SituationView(RestrictedView):
 admin.add_view(AdjativeView(Adjative, db.session))
 admin.add_view(PersonView(Person, db.session))
 admin.add_view(SituationView(Situation, db.session))
+
+
+class Combination(db.Model):
+    __tablename__ = 'combination'
+
+    adjative_id = db.Column(db.Integer, db.ForeignKey('adjative.id'), primary_key=True)
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
+    situation_id = db.Column(db.Integer, db.ForeignKey('situation.id'), primary_key=True)
+
+    adjative = db.relationship('Adjative', backref='combinations')
+    person = db.relationship('Person', backref='combinations')
+    situation = db.relationship('Situation', backref='combinations')
+
+    upvotes = db.Column(db.Integer)
+    downvotes = db.Column(db.Integer)
+    netvotes = db.Column(db.Integer)
+
+    def __init__(self, adjative, person, situation):
+        self.adjative = adjative
+        self.person = person
+        self.situation = situation
+        self.upvotes = 0
+        self.downvotes = 0
+        self.netvotes = 0
+
+    def upvote(self):
+        self.upvotes += 1
+        self.netvotes = self.upvotes - self.downvotes
+
+    def downvote(self):
+        self.downvotes += 1
+        self.netvotes = self.upvotes - self.downvotes
+
+    def __repr__(self):
+        fmt = '<Combination: adjative:{}, person:{}, situation:{}, netvotes:{}>'
+        return fmt.format(self.adjative_id, self.person_id, self.situation_id, self.netvotes)
+
+    def to_str(self):
+        return str(self)
+
+    def __str__(self):
+        if self.adjative:
+            return ' '.join([self.adjative.adjative,
+                             self.person.name,
+                             self.situation.engender(self.person.gender)])
+        else:
+            return ' '.join([self.person.name,
+                             self.situation.engender(self.person.gender)])
+
+
+db.create_all()

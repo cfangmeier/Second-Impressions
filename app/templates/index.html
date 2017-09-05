@@ -2,9 +2,17 @@
 {% block title %}
 {% endblock %}
 {% block content %}
-<h2 class="text-center"><b>Select a GameMode!</b></h2>
-{% for gamemode, (mode_title, mode_type) in gamemodes.items() %}
-<a href="{{url_for(gamemode)}}" class="btn btn-{{mode_type}} btn-lg btn-block" role="button">{{mode_title}}</a>
-{% endfor %}
-</ul>
+<div class="row">
+  <div class="col-sm-4"> </div>
+  <div class="col-sm-4">
+    <h2 class="text-center"><b>Select a GameMode!</b></h2>
+    {% for gamemode, (mode_title, mode_type) in mode_infos.items() %}
+    <a href="{{url_for(gamemode)}}" class="btn btn-{{mode_type}} btn-lg btn-block" role="button">{{mode_title}}</a>
+    {% endfor %}
+    <hr>
+    <a href="{{url_for('halloffame')}}" class="btn btn-primary btn-lg btn-block" role="button">Hall of Fame</a>
+    </ul>
+  </div>
+  <div class="col-sm-4"> </div>
+</div>
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends "base.html" %}
+{% block title %}
+{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-sm-4"> </div>
+  <div class="col-sm-4">
+    <h2 class="text-center"><b>Hall of Fame!</b></h2>
+    <table class="table table-striped">
+    {% for combination in combinations %}
+    <tbody>
+    <tr>
+      <td><h3>{{ combination.to_str()|markdown }}</h3></td>
+      <td><h3>{{ combination.upvotes }} <span class="glyphicon glyphicon-thumbs-up"></span> </h3></td>
+      <td><h3>{{ combination.downvotes }} <span class="glyphicon glyphicon-thumbs-down"></span> </h3></td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+  </div>
+  <div class="col-sm-4"> </div>
+</div>
+{% endblock %}

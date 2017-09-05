@@ -2,21 +2,21 @@
 import os
 
 from flask import (url_for, render_template, redirect,
-                   flash, request, session)
+                   flash, session, request)
 
 from flask_wtf import FlaskForm
 from wtforms import StringField, TextAreaField
 from wtforms.validators import DataRequired
 
 from app import app, db
-from app.models import Adjative, Person, Situation, Gender
+from app.models import Adjative, Person, Situation, Gender, Combination
 
 
 def init_db():
     from flask_security.utils import encrypt_password
     from game_data import adjatives, people, situations
     from app import user_datastore, Role
-    db.create_all()
+    print("Creating fresh DB")
     for adjative in adjatives:
         obj = Adjative(adjative)
         obj.approved = True
@@ -55,35 +55,6 @@ def init_db():
         db.session.commit()
 
 
-def engender(situation, gender):
-    if gender == Gender.unknown:
-        gender = Gender.male
-    subs = {Gender.male: {
-            "{his}": "his",
-            "{him}": "him",
-            "{he}": "he",
-            "{he's}": "he's",
-            "{himself}": "himself",
-            },
-            Gender.female: {
-            "{his}": "her",
-            "{him}": "her",
-            "{he}": "she",
-            "{he's}": "she's",
-            "{himself}": "herself",
-            },
-            Gender.neutral: {
-            "{his}": "its",
-            "{him}": "it",
-            "{he}": "it",
-            "{he's}": "it's",
-            "{himself}": "itself",
-            }}
-    for from_, to in subs[gender].items():
-        situation = situation.replace(from_, to)
-    return situation
-
-
 def pick(l, prevN_name, N=20):
     from random import choice
     from collections import deque
@@ -97,7 +68,7 @@ def pick(l, prevN_name, N=20):
         return pick
 
 
-def new_text(mode):
+def new_combination(mode):
     adjatives = Adjative.query.filter(Adjative.approved).all()
     people = Person.query.filter(Person.approved).all()
     situations = Situation.query.filter(Situation.approved).all()
@@ -107,14 +78,13 @@ def new_text(mode):
         session['prevN_sit'] = []
     if 'prevN_per' not in session:
         session['prevN_per'] = []
-    adj = pick(adjatives, 'prevN_adj').adjative
     person = pick(people, 'prevN_per')
-    name, gender = person.name, person.gender
-    situation = engender(pick(situations, 'prevN_sit').situation, gender)
-    if mode == 'easy':
-        return '  '.join([name, situation])
+    situation = pick(situations, 'prevN_sit')
+    if mode == 'normal':
+        return (None, person, situation)
     else:  # 'hard'
-        return '  '.join([adj, name, situation])
+        adj = pick(adjatives, 'prevN_adj')
+        return (adj, person, situation)
 
 
 @app.route("/submit-situation", methods=["GET", "POST"])
@@ -145,35 +115,87 @@ def submit_person():
         return render_template('submit.html', form=form)
 
 
-gamemodes = {'easy': ('Easy Mode', 'success'),
-             'hard': ('Hard Mode', 'danger'),
-             }
+# gamemodes = {'easy': ('Easy Mode', 'success'),
+mode_infos = {'normal': ('Normal Mode', 'info'),
+              'hard': ('Hard Mode', 'danger'),
+              }
 
 
-@app.route("/easy")
-def easy():
-    return render_template('easy.html',
-                           content=new_text('easy'),
-                           gamemode=gamemodes['easy'])
+def vote(adj_id, per_id, sit_id, updn):
+    if adj_id:
+        adj = Adjative.query.filter(Adjative.id == adj_id).first()
+    else:
+        adj = None
+    per = Person.query.filter(Person.id == per_id).first()
+    sit = Situation.query.filter(Situation.id == sit_id).first()
+    prev_comb = Combination.query.filter(Combination.adjative_id == adj_id and
+                                         Combination.person_id == per_id and
+                                         Combination.situation_id == sit_id).all()
+    if not prev_comb:
+        comb = Combination(adj, per, sit)
+        db.session.add(comb)
+    else:
+        comb = prev_comb[0]
+    if updn == 'upvote':
+        comb.upvote()
+    else:
+        comb.downvote()
+    db.session.commit()
 
 
-@app.route("/hard")
+@app.route('/normal')
+def normal():
+    action = request.args.get('action', 'new')
+    adj, per, sit = session.get('adj_id'), session.get('per_id'), session.get('sit_id'),
+    if action == 'upvote':
+        print('upvoting', adj, per, sit)
+    elif action == 'downvote':
+        print('downvoting', adj, per, sit)
+    adj, per, sit = new_combination('normal')
+    session['adj_id'] = None
+    session['per_id'] = per.id
+    session['sit_id'] = sit.id
+    return render_template('game.html',
+                           person=per,
+                           situation=sit,
+                           gamemode='normal',
+                           mode_info=mode_infos['normal'])
+
+
+@app.route('/halloffame')
+def halloffame():
+    combs = Combination.query.order_by(Combination.netvotes.desc()).limit(30).all()
+    return render_template('halloffame.html',
+                           combinations=combs)
+
+
+@app.route('/hard')
 def hard():
-    return render_template('hard.html',
-                           content=new_text('hard'),
-                           gamemode=gamemodes['hard'])
+    action = request.args.get('action', 'new')
+    if action in ('upvote', 'downvote'):
+        adj_id = session.get('adj_id')
+        per_id = session.get('per_id')
+        sit_id = session.get('sit_id')
+        vote(adj_id, per_id, sit_id, action)
+    adj, per, sit = new_combination('hard')
+    session['adj_id'] = adj.id
+    session['sit_id'] = sit.id
+    session['per_id'] = per.id
+    return render_template('game.html',
+                           adjative=adj,
+                           person=per,
+                           situation=sit,
+                           gamemode='hard',
+                           mode_info=mode_infos['hard'])
 
 
 @app.route("/")
 def index():
-    return render_template('index.html', gamemodes=gamemodes)
+    return render_template('index.html', mode_infos=mode_infos)
 
 
 if __name__ == "__main__":
     app_dir = os.path.realpath(os.path.dirname(__file__))
     database_path = os.path.join(app_dir, app.config['DATABASE_FILE'])
-    if not os.path.exists(database_path):
-        init_db()
-        print('Creating initial db')
-    else:
-        app.run(host="0.0.0.0", port=8080)
+    init_db()
+    app.run(host="0.0.0.0", port=8080)
