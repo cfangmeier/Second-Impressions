@@ -115,31 +115,29 @@ def submit_person():
         return render_template('submit.html', form=form)
 
 
-# gamemodes = {'easy': ('Easy Mode', 'success'),
-mode_infos = {'normal': ('Normal Mode', 'info'),
+mode_infos = {'easy': ('Easy Mode', 'success'),
+              'normal': ('Normal Mode', 'info'),
               'hard': ('Hard Mode', 'danger'),
               }
 
 
-def vote(adj_id, per_id, sit_id, updn):
+def vote(action):
+    adj_id = session.get('adj_id')
+    per_id = session.get('per_id')
+    sit_id = session.get('sit_id')
     per = Person.query.filter(Person.id == per_id).first()
     sit = Situation.query.filter(Situation.id == sit_id).first()
-    if adj_id:
-        adj = Adjative.query.filter(Adjative.id == adj_id).first()
-        prev_comb = Combination.query.filter((Combination.adjative_id == adj_id) &
-                                             (Combination.person_id == per_id) &
-                                             (Combination.situation_id == sit_id)).all()
-    else:
+    if adj_id:  # hard mode combination
+        adj = Adjative.get(adj_id)
+    else:  # easy/normal mode combination
         adj = None
-        prev_comb = Combination.query.filter(Combination.adjative_id.is_(None) &
-                                             (Combination.person_id == per_id) &
-                                             (Combination.situation_id == sit_id)).all()
+    prev_comb = Combination.get(adj_id, per_id, sit_id)
     if not prev_comb:
         comb = Combination(adj, per, sit)
         db.session.add(comb)
     else:
         comb = prev_comb[0]
-    if updn == 'upvote':
+    if action == 'upvote':
         comb.upvote()
     else:
         comb.downvote()
@@ -153,14 +151,40 @@ def halloffame():
                            combinations=combs)
 
 
+@app.route('/easy')
+def easy():
+    action = request.args.get('action', 'new')
+    if action in ('upvote', 'downvote'):
+        vote(action)
+
+    _, per, sit = new_combination('normal')
+    if action == 'rerollperson':
+        sit = Situation.get(session['sit_id'])
+    elif action == 'rerollsituation':
+        per = Person.get(session['per_id'])
+    session['adj_id'] = None
+    session['per_id'] = per.id
+    session['sit_id'] = sit.id
+    comb = ''.join([('<a class="bg-success h1" style="line-height:150%"'
+                     'title="Rerole Person" href="?action=rerollperson">'),
+                    per.name,
+                    '</a>',
+                    ('<a class="bg-warning h1" style="line-height:150%"'
+                     'title="Rerole Situation" href="?action=rerollsituation">'),
+                    ' '+sit.engender(per.gender),
+                    '</a>'])
+
+    return render_template('game.html',
+                           combination=comb,
+                           gamemode='easy',
+                           mode_info=mode_infos['easy'])
+
+
 @app.route('/normal')
 def normal():
     action = request.args.get('action', 'new')
     if action in ('upvote', 'downvote'):
-        adj_id = session.get('adj_id')
-        per_id = session.get('per_id')
-        sit_id = session.get('sit_id')
-        vote(adj_id, per_id, sit_id, action)
+        vote(action)
     _, per, sit = new_combination('normal')
     session['adj_id'] = None
     session['per_id'] = per.id
@@ -176,10 +200,7 @@ def normal():
 def hard():
     action = request.args.get('action', 'new')
     if action in ('upvote', 'downvote'):
-        adj_id = session.get('adj_id')
-        per_id = session.get('per_id')
-        sit_id = session.get('sit_id')
-        vote(adj_id, per_id, sit_id, action)
+        vote(action)
     adj, per, sit = new_combination('hard')
     session['adj_id'] = adj.id
     session['sit_id'] = sit.id

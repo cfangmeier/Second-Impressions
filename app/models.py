@@ -53,6 +53,10 @@ class Adjative(db.Model):
         return '<Adjative: {}, {}>'.format(self.adjative,
                                            self.approved)
 
+    @classmethod
+    def get(cls, id_):
+        return cls.query.filter(cls.id == id_).first()
+
 
 class AdjativeView(RestrictedView):
     page_size = 100
@@ -77,6 +81,10 @@ class Person(db.Model):
         return '<Person: {}({}), {}>'.format(self.name,
                                              self.gender,
                                              self.approved)
+
+    @classmethod
+    def get(cls, id_):
+        return cls.query.filter(cls.id == id_).first()
 
 
 class PersonView(RestrictedView):
@@ -130,6 +138,10 @@ class Situation(db.Model):
         if len(self.situation) > 20:
             sit = sit[:18]+'...'
         return '<Situation: {}, {}>'.format(sit, self.approved)
+
+    @classmethod
+    def get(cls, id_):
+        return cls.query.filter(cls.id == id_).first()
 
 
 class SituationView(RestrictedView):
@@ -190,6 +202,12 @@ class Combination(db.Model):
         else:
             return ' '.join([self.person.name,
                              self.situation.engender(self.person.gender)])
+
+    @classmethod
+    def get(cls, adj_id, per_id, sit_id):
+        return cls.query.filter((cls.adjative_id == adj_id) &
+                                (cls.person_id == per_id) &
+                                (cls.situation_id == sit_id)).first()
 
 
 db.create_all()

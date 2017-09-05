@@ -3,29 +3,18 @@
 {{ super() }}
 {% endblock %}
 {% block content %}
-{% if gamemode=='hard' %}
 <div class="row">
   <div class="col-sm-12">
     <h1 class="text-center">
-      {{ ' '.join([adjative.adjative,person.name,situation.engender(person.gender)])|markdown }}
-      <a class="btn btn-danger btn-lg" role="button" title="This one Sucks!" href="?action=downvote">
-        <span class="glyphicon glyphicon-thumbs-down"></span>
-      </a>
-      <a class="btn btn-primary btn-lg" role="button" title="Gimme Another!" href="?action=new">
-        <span class="glyphicon glyphicon-refresh"></span> Hit Me!
-      </a>
-      <a class="btn btn-success btn-lg" role="button" title="This one's Great!" href="?action=upvote">
-        <span class="glyphicon glyphicon-thumbs-up"></span>
-      </a>
-    <h1>
-  </div>
-</div>
+{% if gamemode=='hard' %}
+  {{ ' '.join([adjative.adjative,person.name,situation.engender(person.gender)])|markdown }}
 {% endif %}
 {% if gamemode=='normal' %}
-<div class="row">
-  <div class="col-sm-12">
-    <h1 class="text-center">
-      {{ ' '.join([person.name, situation.engender(person.gender)])|markdown }}
+  {{ ' '.join([person.name, situation.engender(person.gender)])|markdown }}
+{% endif %}
+{% if gamemode=='easy' %}
+      {{ combination|markdown }}
+{% endif %}
       <a class="btn btn-danger btn-lg" role="button" title="This one Sucks!" href="?action=downvote">
         <span class="glyphicon glyphicon-thumbs-down"></span>
       </a>
@@ -38,7 +27,4 @@
     <h1>
   </div>
 </div>
-{% endif %}
-{% if gamemode=='easy' %}
-{% endif %}
 {% endblock %}
