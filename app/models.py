@@ -144,10 +144,12 @@ admin.add_view(SituationView(Situation, db.session))
 
 class Combination(db.Model):
     __tablename__ = 'combination'
+    __table_args__ = (db.Index('comb_idx', 'adjative_id', 'person_id', 'situation_id'), )
+    id = db.Column(db.Integer, primary_key=True)
 
-    adjative_id = db.Column(db.Integer, db.ForeignKey('adjative.id'), primary_key=True)
-    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), primary_key=True)
-    situation_id = db.Column(db.Integer, db.ForeignKey('situation.id'), primary_key=True)
+    adjative_id = db.Column(db.Integer, db.ForeignKey('adjative.id'))
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'))
+    situation_id = db.Column(db.Integer, db.ForeignKey('situation.id'))
 
     adjative = db.relationship('Adjative', backref='combinations')
     person = db.relationship('Person', backref='combinations')

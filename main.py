@@ -122,15 +122,18 @@ mode_infos = {'normal': ('Normal Mode', 'info'),
 
 
 def vote(adj_id, per_id, sit_id, updn):
-    if adj_id:
-        adj = Adjative.query.filter(Adjative.id == adj_id).first()
-    else:
-        adj = None
     per = Person.query.filter(Person.id == per_id).first()
     sit = Situation.query.filter(Situation.id == sit_id).first()
-    prev_comb = Combination.query.filter(Combination.adjative_id == adj_id and
-                                         Combination.person_id == per_id and
-                                         Combination.situation_id == sit_id).all()
+    if adj_id:
+        adj = Adjative.query.filter(Adjative.id == adj_id).first()
+        prev_comb = Combination.query.filter((Combination.adjative_id == adj_id) &
+                                             (Combination.person_id == per_id) &
+                                             (Combination.situation_id == sit_id)).all()
+    else:
+        adj = None
+        prev_comb = Combination.query.filter(Combination.adjative_id.is_(None) &
+                                             (Combination.person_id == per_id) &
+                                             (Combination.situation_id == sit_id)).all()
     if not prev_comb:
         comb = Combination(adj, per, sit)
         db.session.add(comb)
@@ -143,15 +146,22 @@ def vote(adj_id, per_id, sit_id, updn):
     db.session.commit()
 
 
+@app.route('/halloffame')
+def halloffame():
+    combs = Combination.query.order_by(Combination.netvotes.desc()).limit(30).all()
+    return render_template('halloffame.html',
+                           combinations=combs)
+
+
 @app.route('/normal')
 def normal():
     action = request.args.get('action', 'new')
-    adj, per, sit = session.get('adj_id'), session.get('per_id'), session.get('sit_id'),
-    if action == 'upvote':
-        print('upvoting', adj, per, sit)
-    elif action == 'downvote':
-        print('downvoting', adj, per, sit)
-    adj, per, sit = new_combination('normal')
+    if action in ('upvote', 'downvote'):
+        adj_id = session.get('adj_id')
+        per_id = session.get('per_id')
+        sit_id = session.get('sit_id')
+        vote(adj_id, per_id, sit_id, action)
+    _, per, sit = new_combination('normal')
     session['adj_id'] = None
     session['per_id'] = per.id
     session['sit_id'] = sit.id
@@ -160,13 +170,6 @@ def normal():
                            situation=sit,
                            gamemode='normal',
                            mode_info=mode_infos['normal'])
-
-
-@app.route('/halloffame')
-def halloffame():
-    combs = Combination.query.order_by(Combination.netvotes.desc()).limit(30).all()
-    return render_template('halloffame.html',
-                           combinations=combs)
 
 
 @app.route('/hard')
