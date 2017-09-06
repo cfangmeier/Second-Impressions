@@ -14,6 +14,9 @@
 {% endif %}
 {% if gamemode=='easy' %}
       {{ combination|markdown }}
+      {% if shuffles_left>0 %}
+      <p class="h2">(Rolls left: {{shuffles_left}})</p>
+      {% endif %}
 {% endif %}
       <a class="btn btn-danger btn-lg" role="button" title="This one Sucks!" href="?action=downvote">
         <span class="glyphicon glyphicon-thumbs-down"></span>

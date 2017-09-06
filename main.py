@@ -158,24 +158,34 @@ def easy():
         vote(action)
 
     _, per, sit = new_combination('normal')
+    shuffles_left = session.get('shuffles_left', 3)
     if action == 'rerollperson':
         sit = Situation.get(session['sit_id'])
+        shuffles_left -= 1
     elif action == 'rerollsituation':
         per = Person.get(session['per_id'])
+        shuffles_left -= 1
+    else:  # action=='new'
+        shuffles_left = 3
     session['adj_id'] = None
     session['per_id'] = per.id
     session['sit_id'] = sit.id
-    comb = ''.join([('<a class="bg-success h1" style="line-height:150%"'
-                     'title="Rerole Person" href="?action=rerollperson">'),
-                    per.name,
-                    '</a>',
-                    ('<a class="bg-warning h1" style="line-height:150%"'
-                     'title="Rerole Situation" href="?action=rerollsituation">'),
-                    ' '+sit.engender(per.gender),
-                    '</a>'])
+    session['shuffles_left'] = shuffles_left
+    if shuffles_left > 0:
+        comb = ''.join([('<a class="bg-success h1" style="line-height:150%"'
+                         'title="Rerole Person" href="?action=rerollperson">'),
+                        per.name,
+                        '</a>',
+                        ('<a class="bg-warning h1" style="line-height:150%"'
+                         'title="Rerole Situation" href="?action=rerollsituation">'),
+                        ' '+sit.engender(per.gender),
+                        '</a>'])
+    else:
+        comb = ' '.join([per.name, sit.engender(per.gender)])
 
     return render_template('game.html',
                            combination=comb,
+                           shuffles_left=shuffles_left,
                            gamemode='easy',
                            mode_info=mode_infos['easy'])
 
